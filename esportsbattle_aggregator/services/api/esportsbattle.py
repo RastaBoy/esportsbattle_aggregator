@@ -52,7 +52,7 @@ class ESportsBattleApiHelper(abc.ApiService):
         )
     
 
-    async def get_all_matches(self):
+    async def get_all_matches(self) -> typing.List[typing.Any]:
         raise Exception(f"В данном классе не реализован метод получения информации о ближайших матчах")
 
 

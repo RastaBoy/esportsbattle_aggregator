@@ -1,12 +1,5 @@
 import asyncio
-import aiohttp
-import json
-import enum
-
-import datetime 
-
-from services.api import abc
-from services.api import esportsbattle
+from services.aggregator.esportsbattle import CS2MatchesAggregator, FootballMatchesAggregator
 
 from datetime import datetime
 
@@ -40,22 +33,9 @@ async def req():
     #         pass
 
     # Получение статусов
-    
-    # response = await esportsbattle.ESportsBattleApiHelper(
-    #     'https://cs2.esportsbattle.com/api/'
-    # ).get_statuses()
-    # print(response)
-
-    # time = '2024-01-04T06:00:00Z'
-    # result = datetime.fromisoformat(time)
-    # print(result)
-    
-    # result = await esportsbattle.CS2ESportsBattleAPIHelper().get_all_matches()
-    # print(result)
-
-    result = await esportsbattle.FootballESportsBattleAPIHelper().get_all_matches()
-    print(result)
-
+    matches = await CS2MatchesAggregator().aggragate()
+    print(matches)    
+    ...
 
 if __name__ == "__main__":
     asyncio.run(req())
