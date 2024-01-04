@@ -1,6 +1,10 @@
 import dataclasses
 import typing
+import datetime
 
+# ---------------------------------------------------
+# Статусы
+# ---------------------------------------------------
 
 @dataclasses.dataclass
 class TournamentStatus:
@@ -16,3 +20,37 @@ class MatchStatus:
 class ESportsBattleStatuses:
     tournament_statuses : TournamentStatus
     match_statuses : MatchStatus
+
+
+# ---------------------------------------------------
+# Матчи
+# ---------------------------------------------------
+
+@dataclasses.dataclass
+class TeamInfo:
+    id : int
+    token : str
+
+
+@dataclasses.dataclass
+class ParticipantInfo:
+    id : int
+    team : TeamInfo
+    
+
+@dataclasses.dataclass
+class MatchInfo:
+    id : int
+    date_time : datetime.datetime
+    status_id : str
+    # По-хорошему тут должен быть список
+    participant1 : ParticipantInfo
+    participant2 : ParticipantInfo
+
+    
+@dataclasses.dataclass
+class TournamentInfo:
+    id : int
+    status_id : str
+    token_international : str
+    matches : typing.Optional[typing.List[MatchInfo]] = None

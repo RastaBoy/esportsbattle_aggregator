@@ -3,6 +3,8 @@ import aiohttp
 import json
 import enum
 
+import datetime 
+
 from services.api import abc
 from services.api import esportsbattle
 
@@ -39,13 +41,21 @@ async def req():
 
     # Получение статусов
     
-    response = await esportsbattle.ESportsBattleApiHelper(
-        'https://cs2.esportsbattle.com/api/'
-    ).__get_statuses__()
-    print(response)
+    # response = await esportsbattle.ESportsBattleApiHelper(
+    #     'https://cs2.esportsbattle.com/api/'
+    # ).get_statuses()
+    # print(response)
 
+    # time = '2024-01-04T06:00:00Z'
+    # result = datetime.fromisoformat(time)
+    # print(result)
+    
+    # result = await esportsbattle.CS2ESportsBattleAPIHelper().get_all_matches()
+    # print(result)
 
-    ...
+    result = await esportsbattle.FootballESportsBattleAPIHelper().get_all_matches()
+    print(result)
+
 
 if __name__ == "__main__":
     asyncio.run(req())
