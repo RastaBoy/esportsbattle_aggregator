@@ -1,5 +1,6 @@
 import typing
 import datetime
+import asyncio
 
 from . import abc
 from . import dto
@@ -127,8 +128,14 @@ class CS2ESportsBattleAPIHelper(ESportsBattleApiHelper):
         matches = []
         # TODO Оптимизировать эту часть
         # Можно сделать через таски, чтобы выполнялось синхронно
+        tasks = []
         for tournament in tournaments:
-            matches.extend((await self.get_tournament_matches(tournament.id)))
+            tasks.append(asyncio.create_task(self.get_tournament_matches(tournament.id)))
+
+        results = await asyncio.gather(*tasks)
+
+        for result in results:
+            matches.extend(result)
 
         return matches
 
