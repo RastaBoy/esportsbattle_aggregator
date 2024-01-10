@@ -43,7 +43,6 @@ class MatchInfo:
     id : int
     date_time : datetime.datetime
     status_id : str
-    # По-хорошему тут должен быть список
     participant1 : ParticipantInfo
     participant2 : ParticipantInfo
 

@@ -1,8 +1,8 @@
 import aiohttp
 
 from aiohttp import ClientResponseError
-
 from typing import Dict, Optional, Any
+from loguru import logger as log
 
 
 class ApiService():
@@ -22,15 +22,22 @@ class ApiService():
             data : Any = None,
             json : Any = None
     ) -> Any:
-        # TODO Надо бы доработать обработку ошибок и не факт, что оно всегда json возвращает
+        # TODO Надо бы доработать обработку ошибок
         async with aiohttp.ClientSession() as session:
-            async with session.request(
-                method, 
-                self.url + endpoint,
-                params=query,
-                headers=headers,
-                data=data,
-                json=json,
-            ) as response:
-                response.raise_for_status()
-                return await response.json()
+            log.debug(f"Отправка {method} запроса на URL \"{self.url + endpoint}\"...")
+            try:
+                async with session.request(
+                    method, 
+                    self.url + endpoint,
+                    params=query,
+                    headers=headers,
+                    data=data,
+                    json=json,
+                ) as response:
+                    response.raise_for_status()
+                    result = await response.json()
+                    log.debug(f"Получен ответ: {result}")
+                    return result
+            except Exception as exc:
+                log.exception(f"В ходе отправки запроса на URL \"{self.url + endpoint}\" возникло исключение \"{exc.__class__.__name__}\": {str(exc)}", exc)
+                raise

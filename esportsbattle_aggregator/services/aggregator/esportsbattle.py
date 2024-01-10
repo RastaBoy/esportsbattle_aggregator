@@ -7,77 +7,58 @@ from ..api import esportsbattle
 from ..api import dto as esportsbattle_dto
 
 
-class MatchesAggregator(abc.IAggregator):
+class ESportsBattleTournamentsAggregator(abc.IAggregator):
     _statuses = None
-    _matches = None
+    _tournaments = None
 
-    def __init__(self, api_helper : esportsbattle.ESportsBattleApiHelper):
+    def __init__(self, api_helper : esportsbattle.ESportsBattleApiHelper, discipline_name : str):
         self.api_helper = api_helper
+        self.discipline_name = discipline_name
 
+    # Кэш нужен для того, чтобы не отправлять миллион запросов на API, 
+    # в случае, если нам где-то извне понадобится информация о статусах и матчах
 
     @property
     async def statuses(self):
         if self._statuses is None:
-            statuses = await self.api_helper.get_statuses()
-            self._statuses = statuses
+            self._statuses = await self.api_helper.get_statuses()
 
         return self._statuses
 
 
     @property
-    async def matches(self):
-        if self._matches is None:
-            matches = await self.api_helper.get_all_matches()
-            self._matches = matches
+    async def tournaments(self):
+        if self._tournaments is None:
+            self._tournaments = await self.api_helper.get_tournaments()
         
-        return self._matches
-    
+        return self._tournaments
     
 
-class CS2MatchesAggregator(MatchesAggregator):
-    def __init__(self):
-        super().__init__(
-            api_helper=esportsbattle.CS2ESportsBattleAPIHelper()
-        )
-    
     async def aggragate(self) -> typing.List[esportsbattle_dto.MatchInfo]:
         statuses = await self.api_helper.get_statuses()
-        matches : typing.List[esportsbattle_dto.MatchInfo] = await self.api_helper.get_all_matches()
+        tournaments : typing.List[esportsbattle_dto.MatchInfo] = await self.api_helper.get_tournaments()
 
         # Обновляем временное хранилище
-        self._matches = matches
+        self._tournaments = tournaments
         self._statuses = statuses
-
-        # Собираем актуальные матчи
-        actual_statuses = [statuses.match_statuses.new, ]
-        res = []
-        for match in matches:
-            if match.status_id in actual_statuses:
-                res.append(match)
         
-        return res
+        return tournaments
+    
+    
 
-
-class FootballMatchesAggregator(MatchesAggregator):
+class CS2TournamentsAggregator(ESportsBattleTournamentsAggregator):
     def __init__(self):
         super().__init__(
-            api_helper=esportsbattle.FootballESportsBattleAPIHelper()
+            api_helper=esportsbattle.CS2ESportsBattleAPIHelper(),
+            discipline_name="CS2"
+        )
+    
+
+class FootballTournamentsAggregator(ESportsBattleTournamentsAggregator):
+    def __init__(self):
+        super().__init__(
+            api_helper=esportsbattle.FootballESportsBattleAPIHelper(),
+            discipline_name="FootBall"
         )
 
-    async def aggragate(self) -> typing.List[esportsbattle_dto.MatchInfo]:
-        # Копировать код нехорошо, но пока в голове нету идей, как это можно оптимизировать
-        statuses = await self.api_helper.get_statuses()
-        matches : typing.List[esportsbattle_dto.MatchInfo] = await self.api_helper.get_all_matches()
-
-        # Обновляем временное хранилище
-        self._matches = matches
-        self._statuses = statuses
-
-        # Собираем актуальные матчи
-        actual_statuses = [statuses.match_statuses.new, ]
-        res = []
-        for match in matches:
-            if match.status_id in actual_statuses:
-                res.append(match)
-        
-        return res
+    
