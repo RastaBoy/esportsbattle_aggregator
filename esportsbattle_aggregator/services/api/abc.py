@@ -36,7 +36,7 @@ class ApiService():
                 ) as response:
                     response.raise_for_status()
                     result = await response.json()
-                    log.debug(f"Получен ответ: {result}")
+                    log.debug(f"Получен ответ на {method} запрос на URL \"{self.url + endpoint}\": {result}")
                     return result
             except Exception as exc:
                 log.exception(f"В ходе отправки запроса на URL \"{self.url + endpoint}\" возникло исключение \"{exc.__class__.__name__}\": {str(exc)}", exc)

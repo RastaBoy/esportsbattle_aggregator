@@ -5,10 +5,18 @@ import asyncio
 from loguru import logger as log
 
 from . import abc
-from . import dto
+from .. import dto
 
 
 class ESportsBattleApiHelper(abc.ApiService):
+    def __init__(
+            self, 
+            url : str,
+            discipline_name : str
+        ) -> None:
+        self.discipline_name=discipline_name
+        super().__init__(url)
+
     async def get_statuses(self) -> dto.ESportsBattleStatuses:
         '''
         В рамках задачи нас интересует вполне один конкретный статус, по которым мы и будем выборку делать,
@@ -67,6 +75,7 @@ class ESportsBattleApiHelper(abc.ApiService):
                 touraments.append(
                     dto.TournamentInfo(
                         id=int(el.get('id')),
+                        discipline_name=self.discipline_name,
                         status_id=el.get('status_id'),
                         token_international=el.get('token_international')
                     )
@@ -124,7 +133,8 @@ class ESportsBattleApiHelper(abc.ApiService):
 class CS2ESportsBattleAPIHelper(ESportsBattleApiHelper):
     def __init__(self):
         super().__init__(
-            url='https://cs2.esportsbattle.com/api/'    
+            url='https://cs2.esportsbattle.com/api/',
+            discipline_name='CS2'    
         )
 
 
@@ -132,5 +142,6 @@ class CS2ESportsBattleAPIHelper(ESportsBattleApiHelper):
 class FootballESportsBattleAPIHelper(ESportsBattleApiHelper):
     def __init__(self):
         super().__init__(
-            url='https://football.esportsbattle.com/api/'
+            url='https://football.esportsbattle.com/api/',
+            discipline_name='FootBall'
         )

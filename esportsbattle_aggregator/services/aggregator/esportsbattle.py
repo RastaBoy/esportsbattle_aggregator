@@ -4,16 +4,18 @@ from typing import Any
 from . import abc
 
 from ..api import esportsbattle
-from ..api import dto as esportsbattle_dto
+from .. import dto as esportsbattle_dto
 
 
 class ESportsBattleTournamentsAggregator(abc.IAggregator):
     _statuses = None
     _tournaments = None
 
-    def __init__(self, api_helper : esportsbattle.ESportsBattleApiHelper, discipline_name : str):
+    def __init__(
+        self, 
+        api_helper : esportsbattle.ESportsBattleApiHelper
+    ):
         self.api_helper = api_helper
-        self.discipline_name = discipline_name
 
     # Кэш нужен для того, чтобы не отправлять миллион запросов на API, 
     # в случае, если нам где-то извне понадобится информация о статусах и матчах
@@ -49,16 +51,14 @@ class ESportsBattleTournamentsAggregator(abc.IAggregator):
 class CS2TournamentsAggregator(ESportsBattleTournamentsAggregator):
     def __init__(self):
         super().__init__(
-            api_helper=esportsbattle.CS2ESportsBattleAPIHelper(),
-            discipline_name="CS2"
+            api_helper=esportsbattle.CS2ESportsBattleAPIHelper()
         )
     
 
 class FootballTournamentsAggregator(ESportsBattleTournamentsAggregator):
     def __init__(self):
         super().__init__(
-            api_helper=esportsbattle.FootballESportsBattleAPIHelper(),
-            discipline_name="FootBall"
+            api_helper=esportsbattle.FootballESportsBattleAPIHelper()
         )
 
     
