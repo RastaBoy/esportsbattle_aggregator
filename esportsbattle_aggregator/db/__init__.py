@@ -5,9 +5,9 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 from .models import Base, MetaData
 from .services.meta import MetaService
 
+from .. import config
 
-# TODO Заменить на переменные окружения
-CONNECTION_STRING = "postgresql+asyncpg://esports:123456@127.0.0.1:5432/esports"
+CONNECTION_STRING = f"postgresql+asyncpg://{config.POSTGRES_USERNAME}:{config.POSTGRES_PASSWORD}@{config.POSTGRES_HOST}:{config.POSTGRES_PORT}/{config.POSTGRES_DB_NAME}"
 
 
 class DataBaseController:
