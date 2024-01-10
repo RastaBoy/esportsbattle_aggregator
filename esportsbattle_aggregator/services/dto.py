@@ -64,4 +64,4 @@ class TournamentInfo:
     discipline_name : str
     status_id : str
     token_international : str
-    matches : typing.Optional[typing.List[MatchInfo]] = None
+    matches : typing.List[MatchInfo] = []

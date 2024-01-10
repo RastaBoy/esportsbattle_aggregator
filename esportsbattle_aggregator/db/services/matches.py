@@ -1,5 +1,5 @@
 from .abc import IDBService
-from ..models.models import MatchModel
+from ..models.matches import MatchModel
 
 
 class MatchService(IDBService[MatchModel]):

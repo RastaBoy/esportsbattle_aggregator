@@ -15,4 +15,4 @@ class MetaData(Base):
 
 
 
-from .models import *
+from .matches import *
