@@ -12,7 +12,7 @@ def build_server(
     app = quart.Quart(__name__)
 
     app.register_blueprint(webgui_blueprint)
-    app.register_blueprint(api_v1_blueprint)
+    app.register_blueprint(api_v1_blueprint, url_prefix="/api/v1")
 
     if is_dev:
         import quart_cors

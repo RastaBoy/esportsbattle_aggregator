@@ -10,7 +10,7 @@ test.py
 # Vue2
 .DS_Store
 node_modules
-/dist
+esportsbattle_front_vue/dist
 
 
 # local env files
