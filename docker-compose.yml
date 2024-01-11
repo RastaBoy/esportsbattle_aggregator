@@ -1,0 +1,29 @@
+version: "3"
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=esportsbattle_matches
+      - POSTGRES_USER=esports
+      - POSTGRES_PASSWORD=keepsecret
+  app:
+    build:
+      context: contextPath
+      dockerfile: Dockerfile
+    command: ["python", "start_app.py"]
+    volumes:
+      - .:/app
+    ports:
+      - "11011:11011"
+    environment:
+      - POSTGRES_USERNAME=esports
+      - POSTGRES_PASSWORD=keepsecret
+      - POSTGRES_HOST=localhost
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB_NAME=esportsbattle_matches
+      - APP_PORT=11011
+      - UPDATE_TIMEOUT=60
+    depends_on:
+      - db
