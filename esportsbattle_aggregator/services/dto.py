@@ -64,4 +64,4 @@ class TournamentInfo:
     discipline_name : str
     status_id : str
     token_international : str
-    matches : typing.List[MatchInfo] = []
+    matches : typing.List[MatchInfo] = dataclasses.field(default_factory=list)

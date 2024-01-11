@@ -8,4 +8,5 @@ POSTGRES_PORT=os.environ['POSTGRES_PORT']
 POSTGRES_DB_NAME=os.environ['POSTGRES_DB_NAME']
 
 # Настройки приложения
+APP_PORT=os.environ['APP_PORT']
 UPDATE_TIMEOUT=os.environ['UPDATE_TIMEOUT']

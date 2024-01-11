@@ -11,6 +11,8 @@ from .controllers.esportsbattle import ESportsBattleTournamentsFilter, MatchStat
 
 from .services.aggregator.esportsbattle import CS2TournamentsAggregator, FootballTournamentsAggregator
 
+from .server import run_server
+
 async def start_app():
     try:
         from . import config
@@ -26,10 +28,8 @@ async def start_app():
         return
     log.info("База данных инициализирована.")
 
-    await main_loop(int(config.UPDATE_TIMEOUT))
-    # matches = await CS2TournamentsAggregator().aggragate()
-    # print(matches)    
-    ...
+    await run_server(is_dev=True)
+    # await main_loop(int(config.UPDATE_TIMEOUT))
 
 
 
