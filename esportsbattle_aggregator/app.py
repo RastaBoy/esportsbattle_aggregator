@@ -28,8 +28,10 @@ async def start_app():
         return
     log.info("База данных инициализирована.")
 
-    await run_server(is_dev=True)
-    # await main_loop(int(config.UPDATE_TIMEOUT))
+    await asyncio.gather(
+        asyncio.create_task(run_server(server_port=int(config.APP_PORT), is_dev=True)), 
+        asyncio.create_task(main_loop(int(config.UPDATE_TIMEOUT)))
+    )
 
 
 
@@ -45,7 +47,7 @@ async def main_loop(update_timeout : int = 60):
             filtered_tournaments = await tournaments_filter.get_filtered_data(
                 tournament_statuses=[
                     TournamentStatus.PUBLIC,
-                    TournamentStatus.STARTED
+                    TournamentStatus.STARTED,
                 ],
                 match_statuses=[
                     MatchStatus.NEW,

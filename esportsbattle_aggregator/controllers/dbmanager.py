@@ -36,7 +36,6 @@ class ESportsBattleDBManager:
                     if not db_match.original_id in actual_ids:
                         matches_to_remove.append(db_match.id)
 
-                matches_to_remove = [1, ]
                 if matches_to_remove:
                     await self.match_service.session.execute(text(f"DELETE FROM matches WHERE id IN ({",".join([str(el) for el in matches_to_remove])})"))
                     # await self.match_service.commit()
