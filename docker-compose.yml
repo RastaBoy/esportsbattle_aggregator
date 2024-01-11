@@ -1,20 +1,28 @@
 version: "3"
+networks:
+  esportsbattle_net:
 services:
   db:
     image: postgres
+    container_name: esportsbattle_postgres
+    restart: always
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=esportsbattle_matches
       - POSTGRES_USER=esports
       - POSTGRES_PASSWORD=keepsecret
+    ports:
+      - 5432:5432
+    networks:
+      - esportsbattle_net
   app:
-    build:
-      context: contextPath
-      dockerfile: Dockerfile
+    build: .
+    container_name: esportsbattle_aggregator_server
+    restart: always
     command: ["python", "start_app.py"]
     volumes:
-      - .:/app
+      - ./docker-logs:/app/logs
     ports:
       - "11011:11011"
     environment:
@@ -27,3 +35,5 @@ services:
       - UPDATE_TIMEOUT=60
     depends_on:
       - db
+    networks:
+      - esportsbattle_net

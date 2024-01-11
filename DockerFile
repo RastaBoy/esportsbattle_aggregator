@@ -1,4 +1,4 @@
-FROM python
+FROM python:latest
 
 WORKDIR /app
 
@@ -7,4 +7,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD [ "python", "./notessite/manage.py", "runserver", "0.0.0.0:8000"]
+CMD [ "python", "start_app.py"]

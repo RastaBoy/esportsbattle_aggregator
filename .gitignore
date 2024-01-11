@@ -5,7 +5,8 @@ logs
 *.log
 .vscode
 test.py
-
+data
+docker-logs
 
 # Vue2
 .DS_Store

@@ -5,6 +5,7 @@ logs
 *.log
 esportsbattle_front_vue
 node_modules
+test.py
 
 
 # local env files
