@@ -71,30 +71,32 @@ class ESportsBattleApiHelper(abc.ApiService):
             }
         )
 
-        tournaments = []
-        total_pages = response.get('totalPages', 1)
         # TODO Здесь нужно рекурсивно пробежаться по всем страницам
-        if response.get('tournaments') is not None:
-            for el in response.get('tournaments'):
-                tournaments.append(
-                    dto.TournamentInfo(
-                        id=int(el.get('id')),
-                        discipline_name=self.discipline_name,
-                        status_id=el.get('status_id'),
-                        token_international=el.get('token_international')
-                    )
-                )
-        tasks = []
-        for tournament in tournaments:
-            tasks.append(asyncio.create_task(self.fill_tournament_matches(tournament)))
-        
-        await asyncio.gather(*tasks)
+        tournaments = []
+        total_pages = response.get('totalPages')
+        if page <= total_pages:
+            if response.get('tournaments') is not None:
+                if response.get('tournament'):
+                    for el in response.get('tournaments'):
+                        tournaments.append(
+                            dto.TournamentInfo(
+                                id=int(el.get('id')),
+                                discipline_name=self.discipline_name,
+                                status_id=el.get('status_id'),
+                                token_international=el.get('token_international')
+                            )
+                        )
+            tasks = []
+            for tournament in tournaments:
+                tasks.append(asyncio.create_task(self.fill_tournament_matches(tournament)))
+            
+            await asyncio.gather(*tasks)
 
-        # TODO Перепиши
-        if total_pages > 1 and page <= total_pages:
-            tournaments.extend(await self.get_tournaments(page=page+1))
+            # TODO Перепиши
+            if page <= total_pages:
+                tournaments.extend(await self.get_tournaments(page=page+1))
 
-        return tournaments
+            return tournaments
 
 
     async def fill_tournament_matches(self, tournament : dto.TournamentInfo):
