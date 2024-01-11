@@ -1,6 +1,7 @@
 version: "3"
 networks:
   esportsbattle_net:
+    driver: bridge
 services:
   db:
     image: postgres
@@ -9,11 +10,9 @@ services:
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=esportsbattle_matches
-      - POSTGRES_USER=esports
       - POSTGRES_PASSWORD=keepsecret
     ports:
-      - 5432:5432
+      - 5432:5433
     networks:
       - esportsbattle_net
   app:
@@ -28,7 +27,7 @@ services:
     environment:
       - POSTGRES_USERNAME=esports
       - POSTGRES_PASSWORD=keepsecret
-      - POSTGRES_HOST=localhost
+      - POSTGRES_HOST=db
       - POSTGRES_PORT=5432
       - POSTGRES_DB_NAME=esportsbattle_matches
       - APP_PORT=11011
