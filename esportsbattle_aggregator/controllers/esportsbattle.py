@@ -1,5 +1,8 @@
 import typing
 import enum
+import aiohttp
+
+from loguru import logger as log
 
 from ..services import dto
 from ..services.aggregator.esportsbattle import ESportsBattleTournamentsAggregator
@@ -103,23 +106,27 @@ class ESportsBattleTournamentsFilter:
     ):
         data = []
         for aggregator in self.aggregators:
-            tournaments = await aggregator.aggragate()
-            statuses_info = await aggregator.statuses
+            # TODO Не факапить всё, если не получилось по одной дисциплине собрать статусы или данные
+            try:
+                tournaments = await aggregator.aggragate()
+                statuses_info = await aggregator.statuses
 
-            actual_torunament_statuses = self.__get_status_codes__(
-                statuses_info=statuses_info.tournament_statuses, 
-                intested_statuses=tournament_statuses
-            )
-            actual_match_statuses = self.__get_status_codes__(
-                statuses_info=statuses_info.match_statuses,
-                intested_statuses=match_statuses
-            )
-            data.extend(
-                self.filter(
-                    tournaments,
-                    actual_torunament_statuses,
-                    actual_match_statuses
+                actual_torunament_statuses = self.__get_status_codes__(
+                    statuses_info=statuses_info.tournament_statuses, 
+                    intested_statuses=tournament_statuses
                 )
-            )
-            
+                actual_match_statuses = self.__get_status_codes__(
+                    statuses_info=statuses_info.match_statuses,
+                    intested_statuses=match_statuses
+                )
+                data.extend(
+                    self.filter(
+                        tournaments,
+                        actual_torunament_statuses,
+                        actual_match_statuses
+                    )
+                )
+            except aiohttp.ClientResponseError as exc:
+                log.error(f"Не удалось собрать данные по агрегатору \"{aggregator.__class__.__name__}\" по причине \"{exc.__class__.__name__}\": {str(exc)}")
+                continue        
         return data

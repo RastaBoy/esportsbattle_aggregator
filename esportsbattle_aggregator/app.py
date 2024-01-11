@@ -47,10 +47,10 @@ async def main_loop(update_timeout : int = 60):
             filtered_tournaments = await tournaments_filter.get_filtered_data(
                 tournament_statuses=[
                     TournamentStatus.PUBLIC,
-                    TournamentStatus.STARTED,
+                    TournamentStatus.STARTED
                 ],
                 match_statuses=[
-                    MatchStatus.NEW,
+                    MatchStatus.NEW
                 ]
             )
             async with DataBaseController.get_session() as session:

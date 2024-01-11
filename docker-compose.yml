@@ -10,7 +10,7 @@ services:
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_PASSWORD=keepsecret
+      - POSTGRES_PASSWORD=keepsecret 
       - POSTGRES_USER=esports
       - POSTGRES_DB=esportsbattle_matches
     ports:

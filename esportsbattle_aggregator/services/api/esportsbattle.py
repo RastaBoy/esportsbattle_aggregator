@@ -58,21 +58,25 @@ class ESportsBattleApiHelper(abc.ApiService):
         )
     
 
-    async def get_tournaments(self) -> typing.List[dto.TournamentInfo]:
+    async def get_tournaments(self, page=1) -> typing.List[dto.TournamentInfo]:
+        # Турниры располагаются на множестве страниц, 
+        # Поле totalPages - относительно него нужно скакать
         response : dict = await self.__send_request__(
             'GET',
             '/tournaments',
             query={
-                'page' : 1,
-                'dateFrom' : datetime.datetime(2024, 1, 2, 17, 0, 0).isoformat(),
-                'dateTo' : datetime.datetime(2025, 1, 2, 17, 0, 0).isoformat()
+                'page' : page,
+                'dateFrom' : datetime.datetime.now().strftime('%Y/%m/%d'),
+                'dateTo' : (datetime.datetime.now() + datetime.timedelta(days=365)).strftime('%Y/%m/%d')
             }
         )
 
-        touraments = []
+        tournaments = []
+        total_pages = response.get('totalPages', 1)
+        # TODO Здесь нужно рекурсивно пробежаться по всем страницам
         if response.get('tournaments') is not None:
             for el in response.get('tournaments'):
-                touraments.append(
+                tournaments.append(
                     dto.TournamentInfo(
                         id=int(el.get('id')),
                         discipline_name=self.discipline_name,
@@ -81,50 +85,57 @@ class ESportsBattleApiHelper(abc.ApiService):
                     )
                 )
         tasks = []
-        for tournament in touraments:
+        for tournament in tournaments:
             tasks.append(asyncio.create_task(self.fill_tournament_matches(tournament)))
         
         await asyncio.gather(*tasks)
 
-        return touraments
+        # TODO Перепиши
+        if total_pages > 1 and page <= total_pages:
+            tournaments.extend(await self.get_tournaments(page=page+1))
+
+        return tournaments
 
 
     async def fill_tournament_matches(self, tournament : dto.TournamentInfo):
         matches = await self.get_tournament_matches(tournament.id)
-        tournament.matches = matches
+        tournament.matches.extend(matches)
 
 
     async def get_tournament_matches(self, tournament_id : str) -> typing.List[dto.MatchInfo]:
-        response : list = await self.__send_request__(
-            'GET',
-            f'/tournaments/{tournament_id}/matches'
-        )
+        try:
+            response : list = await self.__send_request__(
+                'GET',
+                f'/tournaments/{tournament_id}/matches'
+            )
 
-        result = []
-        for el in response:
-            result.append(
-                dto.MatchInfo(
-                    id=int(el.get('id')),
-                    date_time=datetime.datetime.fromisoformat(el.get('date')),
-                    status_id=el.get('status_id'),
-                    participant1=dto.ParticipantInfo(
-                        id=int(el['participant1']['id']),
-                        team=dto.TeamInfo(
-                            id=int(el['participant1']['team']['id']),
-                            token=el['participant1']['team']['token_international']
-                        )
-                    ),
-                    participant2=dto.ParticipantInfo(
-                        id=int(el['participant2']['id']),
-                        team=dto.TeamInfo(
-                            id=int(el['participant2']['team']['id']),
-                            token=el['participant2']['team']['token_international']
+            result = []
+            for el in response:
+                result.append(
+                    dto.MatchInfo(
+                        id=int(el.get('id')),
+                        date_time=datetime.datetime.fromisoformat(el.get('date')),
+                        status_id=el.get('status_id'),
+                        participant1=dto.ParticipantInfo(
+                            id=int(el['participant1']['id']),
+                            team=dto.TeamInfo(
+                                id=int(el['participant1']['team']['id']),
+                                token=el['participant1']['team']['token_international']
+                            )
+                        ),
+                        participant2=dto.ParticipantInfo(
+                            id=int(el['participant2']['id']),
+                            team=dto.TeamInfo(
+                                id=int(el['participant2']['team']['id']),
+                                token=el['participant2']['team']['token_international']
+                            )
                         )
                     )
                 )
-            )
-        
-        return result
+            
+            return result
+        except Exception:
+            return []
 
 
 
