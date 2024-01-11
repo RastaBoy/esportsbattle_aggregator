@@ -34,6 +34,29 @@ docker-compose --version
 git clone https://github.com/RastaBoy/esportsbattle_aggregator.git
 ```
 
+## Настройки
+### Важно! Это моё первое знакомство с docker-compose и вполне возможно, что настройки задаются по-другому.
+В файле docker-compose.yml, в блоках "enviroment" задаются следующие переменные:
+```
+services:
+  db:
+    ...
+    environment:
+      - POSTGRES_PASSWORD=keepsecret # Пароль для доступа к Б/Д
+      - POSTGRES_USER=esports # Имя пользоватебя для доступа к Б/Д
+      - POSTGRES_DB=esportsbattle_matches # Название Б/Д
+  app:
+    ...
+    environment:
+      - POSTGRES_USERNAME=esports # Имя пользоватебя для доступа к Б/Д
+      - POSTGRES_PASSWORD=keepsecret # Пароль для доступа к Б/Д
+      - POSTGRES_HOST=db 
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB_NAME=esportsbattle_matches # Название Б/Д
+      - APP_PORT=11011 # Порт, на котором запускается сервер
+      - UPDATE_TIMEOUT=60 # Задержка между обновлениями информации о грядущих матчах
+```
+
 ## Запуск!
 Итак, когда проект склонирован, а Docker установлен, можно приступить к запуску проекта. Для этого инициализируйте командную строку в папку с проектом и введите следующую команду:
 ```
@@ -41,3 +64,5 @@ docker-compose up
 ```
 
 По-умолчанию проект запускается на порту 11011 и для того, чтобы ознакомиться с результатами работы приложения, в браузере необходимо перейти по ссылке http://127.0.0.1:11011/.
+В случае, если всё прошло успешно, то по данному адресу должно отобразиться следующее:
+![photo_2024-01-11_18-07-12](https://github.com/RastaBoy/esportsbattle_aggregator/assets/37360266/dbf6c103-1cd4-4b8c-93e7-661818961fc4)
