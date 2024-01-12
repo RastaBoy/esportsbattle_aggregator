@@ -28,6 +28,13 @@
           class="elevation-1"
         >
         </v-data-table>
+        <v-spacer></v-spacer>
+        <div style="margin-top: 10px;">
+          <v-btn
+            color="primary"
+            @click="update_info()"
+          >Обновить</v-btn>
+        </div>
       </div>
     </v-card-text>
   </v-card>
@@ -53,6 +60,7 @@
       while(this.loading) {
         try 
         {
+          this.loading = true
           await this.$store.dispatch('load_matches')
           this.loading = false
           this.error.state = false
@@ -74,6 +82,25 @@
         do {
           currentDate = Date.now();
         } while (currentDate - date < milliseconds);
+      },
+      async update_info() {
+        try 
+        {
+          this.loading = true
+          await this.$store.dispatch('load_matches')
+          this.loading = false
+          this.error.state = false
+        } 
+        catch(error) 
+        {
+          console.log(error)
+          this.error.state = true
+          this.error.message = error.message
+          setTimeout(() => {
+            this.error.state = false
+            this.error.message = ""
+          }, 3000);
+        }
       }
     },
     computed: {
@@ -94,6 +121,10 @@
             value : "time"
           },
           {
+            text: "Формат времени",
+            value: "datetime_format"
+          },
+          {
             text: "Название дисциплины",
             value: "discipline_name"
           },
@@ -111,7 +142,6 @@
           }
         ]
       }
-
-    },
+    }
   }
 </script>
