@@ -36,9 +36,9 @@ class ESportsBattleTournamentsAggregator(abc.IAggregator):
         return self._tournaments
     
 
-    async def aggragate(self) -> typing.List[esportsbattle_dto.MatchInfo]:
+    async def aggragate(self) -> typing.List[esportsbattle_dto.TournamentInfo]:
         statuses = await self.api_helper.get_statuses()
-        tournaments : typing.List[esportsbattle_dto.MatchInfo] = await self.api_helper.get_tournaments()
+        tournaments : typing.List[esportsbattle_dto.TournamentInfo] = await self.api_helper.get_tournaments()
 
         # Обновляем временное хранилище
         self._tournaments = tournaments

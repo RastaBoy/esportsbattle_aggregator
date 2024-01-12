@@ -76,7 +76,7 @@ class ESportsBattleApiHelper(abc.ApiService):
         total_pages = response.get('totalPages')
         if page <= total_pages:
             if response.get('tournaments') is not None:
-                if response.get('tournament'):
+                if response.get('tournaments'):
                     for el in response.get('tournaments'):
                         tournaments.append(
                             dto.TournamentInfo(
@@ -92,11 +92,12 @@ class ESportsBattleApiHelper(abc.ApiService):
             
             await asyncio.gather(*tasks)
 
-            # TODO Перепиши
-            if page <= total_pages:
+            # На этом этапе есть список чемпионатов с заполненными матчами
+            if page < total_pages:
                 tournaments.extend(await self.get_tournaments(page=page+1))
+            
 
-            return tournaments
+        return tournaments
 
 
     async def fill_tournament_matches(self, tournament : dto.TournamentInfo):

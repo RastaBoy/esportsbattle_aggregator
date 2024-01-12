@@ -9,6 +9,8 @@ from esportsbattle_aggregator.app import start_app
 
 __version__ = (1,0,0,0)
 
+
+# TODO Вынести LogLevel в глобальные переменные
 log.add(
     os.path.join(os.getcwd(), 'logs', '{time:DD-MM-YYYY}.log'), 
     format='{time:HH:mm:ss.SSSZ} | [{level}]\t| {message}'

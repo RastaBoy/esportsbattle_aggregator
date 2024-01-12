@@ -1,6 +1,7 @@
 import typing
 import enum
 import aiohttp
+import dataclasses
 
 from loguru import logger as log
 
@@ -97,19 +98,26 @@ class ESportsBattleTournamentsFilter:
                 )
 
         return result
+    
+    def __count_matches__(self, tournaments : typing.List[dto.TournamentInfo]) -> int:
+        count = 0
+        for t in tournaments:
+            count += len(t.matches)
+        return count
 
 
     async def get_filtered_data(
         self,
         tournament_statuses : typing.List[TournamentStatus],
         match_statuses : typing.List[MatchStatus]
-    ):
-        data = []
+    ) -> typing.List[dto.TournamentInfo]:
+        filtered_tournaments : typing.List[dto.TournamentInfo] = []
         for aggregator in self.aggregators:
             # TODO Не факапить всё, если не получилось по одной дисциплине собрать статусы или данные
             try:
                 tournaments = await aggregator.aggragate()
                 statuses_info = await aggregator.statuses
+
 
                 actual_torunament_statuses = self.__get_status_codes__(
                     statuses_info=statuses_info.tournament_statuses, 
@@ -119,14 +127,35 @@ class ESportsBattleTournamentsFilter:
                     statuses_info=statuses_info.match_statuses,
                     intested_statuses=match_statuses
                 )
-                data.extend(
+                
+                # ------------------------------------------------------------
+                # Отладка
+                # ------------------------------------------------------------
+                log.debug(f"Сбор данных от агрегатора \"{aggregator.__class__.__name__}\"")
+                log.debug(f"Входное число чемпионатов: {len(tournaments)}")
+                log.debug(f"Входное число матчей: {self.__count_matches__(tournaments)}")
+                log.debug(f"Перечень статусов для чемпионатов:\n{"\n".join([f"{ids}.{kv[0]} - {kv[1]}" for ids, kv in enumerate(dataclasses.asdict(statuses_info.tournament_statuses).items(), 1)])}")
+                log.debug(f"Перечень статусов для матчей:\n{"\n".join([f"{ids}.{kv[0]} - {kv[1]}" for ids, kv in enumerate(dataclasses.asdict(statuses_info.match_statuses).items(), 1)])}")
+
+                log.debug(f"Список актуальных статусов чемпионатов: {actual_torunament_statuses}")
+                log.debug(f"Список актуальных статусов матчей: {actual_match_statuses}")
+                # ------------------------------------------------------------
+
+                filtered_tournaments.extend(
                     self.filter(
                         tournaments,
                         actual_torunament_statuses,
                         actual_match_statuses
                     )
                 )
+                # ------------------------------------------------------------
+                # Отладка
+                # ------------------------------------------------------------
+                log.debug(f"Число чемпионатов после фильтрации: {len(filtered_tournaments)}")
+                log.debug(f"Число матчей после фильтрации: {self.__count_matches__(filtered_tournaments)}")
+                # ------------------------------------------------------------
+
             except aiohttp.ClientResponseError as exc:
                 log.error(f"Не удалось собрать данные по агрегатору \"{aggregator.__class__.__name__}\" по причине \"{exc.__class__.__name__}\": {str(exc)}")
                 continue        
-        return data
+        return filtered_tournaments
