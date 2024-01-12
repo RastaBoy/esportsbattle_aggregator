@@ -1,2 +1,2 @@
 up:
-	docker-compose -f docker-compose.yml up --force-recreate
+	docker-compose up -d --no-deps --build app
