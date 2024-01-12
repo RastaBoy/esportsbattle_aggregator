@@ -27,6 +27,7 @@ class MatchModel(Base):
             "tournament_name" : self.tournament_name,
             "date" : self.date_time.strftime("%d-%m-%Y"),
             "time" : self.date_time.strftime("%H:%M:%S"),
+            "datetime_format" : "UTC",
             "participant1_name" : self.participant1_name,
             "participant2_name" : self.participant2_name
         }

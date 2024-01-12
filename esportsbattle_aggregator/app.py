@@ -29,8 +29,8 @@ async def start_app():
     log.info("База данных инициализирована.")
 
     await asyncio.gather(
-        asyncio.create_task(run_server(server_port=int(config.APP_PORT), is_dev=False)), 
-        asyncio.create_task(main_loop(int(config.UPDATE_TIMEOUT)))
+        asyncio.create_task(run_server(server_port=config.APP_PORT, is_dev=config.IS_DEV)), 
+        asyncio.create_task(main_loop(config.UPDATE_TIMEOUT))
     )
 
 

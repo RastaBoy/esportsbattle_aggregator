@@ -8,5 +8,6 @@ POSTGRES_PORT=os.environ.get('POSTGRES_PORT', 5432)
 POSTGRES_DB_NAME=os.environ.get('POSTGRES_DB_NAME', 'esports')
 
 # Настройки приложения
-APP_PORT=os.environ.get('APP_PORT', 11011)
-UPDATE_TIMEOUT=os.environ.get('UPDATE_TIMEOUT', 60)
+IS_DEV=bool(os.environ.get('IS_DEV', False))
+APP_PORT=int(os.environ.get('APP_PORT', 11011))
+UPDATE_TIMEOUT=int(os.environ.get('UPDATE_TIMEOUT', 60))
