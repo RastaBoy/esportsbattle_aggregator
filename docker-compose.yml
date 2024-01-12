@@ -7,6 +7,11 @@ services:
     image: postgres
     container_name: esportsbattle_postgres
     restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
@@ -35,6 +40,7 @@ services:
       - APP_PORT=${APP_PORT}
       - UPDATE_TIMEOUT=${UPDATE_TIMEOUT}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - esportsbattle_net
