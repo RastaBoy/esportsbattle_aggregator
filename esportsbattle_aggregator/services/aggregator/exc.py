@@ -1,0 +1,3 @@
+
+class AggregatorException(Exception):
+    ...

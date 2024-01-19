@@ -1,10 +1,14 @@
 import typing
+import asyncio
+
 from typing import Any
+from loguru import logger as log
 
 from . import abc
 
 from ..api import esportsbattle
-from .. import dto as esportsbattle_dto
+from .. import dto
+from . import exc as exceptions
 
 
 class ESportsBattleTournamentsAggregator(abc.IAggregator):
@@ -30,21 +34,38 @@ class ESportsBattleTournamentsAggregator(abc.IAggregator):
 
     @property
     async def tournaments(self):
+        # TODO Переделать
         if self._tournaments is None:
-            self._tournaments = await self.api_helper.get_tournaments()
+            self._tournaments = await self.__aggragate_tournaments__()
         
         return self._tournaments
     
 
-    async def aggragate(self) -> typing.List[esportsbattle_dto.TournamentInfo]:
-        statuses = await self.api_helper.get_statuses()
-        tournaments : typing.List[esportsbattle_dto.TournamentInfo] = await self.api_helper.get_tournaments()
+    async def __aggragate_tournaments__(self) -> typing.List[dto.TournamentInfo]:
+        try:
+            tournaments : typing.List[dto.TournamentInfo] = []
 
-        # Обновляем временное хранилище
-        self._tournaments = tournaments
-        self._statuses = statuses
+            tournaments_info : dto.TournamentsInfoResponse = await self.api_helper.get_tournaments_info()
+            tournaments.extend(tournaments_info.tournaments)
+            if tournaments_info.total_pages > 1:
+                cur_page = 1
+                while cur_page <= tournaments_info.total_pages:
+                    info : dto.TournamentsInfoResponse = await self.api_helper.get_tournaments_info(page=cur_page)
+                    tournaments.extend(info.tournaments)                    
+                    cur_page += 1
+            
+            return tournaments
+        except Exception as exc:
+            log.error(f"Не удалось собрать данные по дисциплине \"{self.api_helper.discipline_name}\" в связи с исключением \"{exc.__class__.__name__}\": {str(exc)}")
+            raise exceptions.AggregatorException(f"Не удалось собрать данные по дисциплине \"{self.api_helper.discipline_name}\" в связи с исключением \"{exc.__class__.__name__}\": {str(exc)}")
+
+
+    async def aggragate(self) -> typing.List[dto.TournamentInfo]:
+
+        self._tournaments = await self.__aggragate_tournaments__()
+        self._statuses = await self.api_helper.get_statuses()
         
-        return tournaments
+        return self._tournaments
     
     
 

@@ -65,3 +65,13 @@ class TournamentInfo:
     status_id : str
     token_international : str
     matches : typing.List[MatchInfo] = dataclasses.field(default_factory=list)
+
+
+# ---------------------------------------------------
+# Ответы от API
+# ---------------------------------------------------
+
+@dataclasses.dataclass
+class TournamentsInfoResponse:
+    total_pages : int
+    tournaments : typing.List[TournamentInfo] = dataclasses.field(default_factory=list)

@@ -58,7 +58,11 @@ class ESportsBattleApiHelper(abc.ApiService):
         )
     
 
-    async def get_tournaments(self, page=1) -> typing.List[dto.TournamentInfo]:
+    async def get_tournaments_info(self, page=1) -> dto.TournamentsInfoResponse:
+        # TODO Изменить возвращаемое значение у метода,
+        # Теперь он будет возвращать dto.TournamentsInfoResponse,
+        # Где будет информация по числу страниц
+
         # Турниры располагаются на множестве страниц, 
         # Поле totalPages - относительно него нужно скакать
         response : dict = await self.__send_request__(
@@ -71,33 +75,34 @@ class ESportsBattleApiHelper(abc.ApiService):
             }
         )
 
-        # TODO Здесь нужно рекурсивно пробежаться по всем страницам
         tournaments = []
         total_pages = response.get('totalPages')
-        if page <= total_pages:
-            if response.get('tournaments') is not None:
-                if response.get('tournaments'):
-                    for el in response.get('tournaments'):
-                        tournaments.append(
-                            dto.TournamentInfo(
-                                id=int(el.get('id')),
-                                discipline_name=self.discipline_name,
-                                status_id=el.get('status_id'),
-                                token_international=el.get('token_international')
-                            )
+        if response.get('tournaments') is not None:
+            if response.get('tournaments'):
+                for el in response.get('tournaments'):
+                    tournaments.append(
+                        dto.TournamentInfo(
+                            id=int(el.get('id')),
+                            discipline_name=self.discipline_name,
+                            status_id=el.get('status_id'),
+                            token_international=el.get('token_international')
                         )
-            tasks = []
-            for tournament in tournaments:
-                tasks.append(asyncio.create_task(self.fill_tournament_matches(tournament)))
-            
-            await asyncio.gather(*tasks)
+                    )
+        tasks = []
+        for tournament in tournaments:
+            tasks.append(asyncio.create_task(self.fill_tournament_matches(tournament)))
+        
+        await asyncio.gather(*tasks)
 
-            # На этом этапе есть список чемпионатов с заполненными матчами
-            if page < total_pages:
-                tournaments.extend(await self.get_tournaments(page=page+1))
+        # На этом этапе есть список чемпионатов с заполненными матчами
+        # if page < total_pages:
+        #     tournaments.extend(await self.get_tournaments(page=page+1))
             
 
-        return tournaments
+        return dto.TournamentsInfoResponse(
+            total_pages=total_pages,
+            tournaments=tournaments
+        )
 
 
     async def fill_tournament_matches(self, tournament : dto.TournamentInfo):
@@ -139,10 +144,7 @@ class ESportsBattleApiHelper(abc.ApiService):
             return result
         except Exception:
             return []
-
-
-
-
+        
 
 class CS2ESportsBattleAPIHelper(ESportsBattleApiHelper):
     def __init__(self):
