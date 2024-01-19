@@ -44,6 +44,7 @@ async def main_loop(update_timeout : int = 60):
     )
     while True:
         try:
+            # Список статусов чемпионатов/матчей можно вынести в глобальные настройки, чтобы с фронта уметь менять список статусов
             filtered_tournaments = await tournaments_filter.get_filtered_data(
                 tournament_statuses=[
                     TournamentStatus.PUBLIC,
