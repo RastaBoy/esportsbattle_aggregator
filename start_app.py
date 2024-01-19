@@ -7,7 +7,7 @@ from loguru import logger as log
 
 from esportsbattle_aggregator.app import start_app
 
-__version__ = (1,0,0,0)
+__version__ = (1,0,1,10)
 
 
 # TODO Вынести LogLevel в глобальные переменные
